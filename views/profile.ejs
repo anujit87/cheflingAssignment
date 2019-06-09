@@ -1,0 +1,98 @@
+<% include partials/header %>
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-sm-4 col-md-3"></div>
+        <div class="col-sm-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <% if(result) { %>
+                        <h5 class="card-title">Name: <%= result.name %></h5>
+                        <h6>Email: <%= result.email %></h6>
+                    <% } %>
+                        <h6>Auth Token:  </h6><span id="auth-span"></span>
+                    <br>
+                    <button id="update-profile" onclick="displayForm()" class="btn btn-primary mt-2"> Update Profile </button>
+                </div>
+            </div>
+            <div class="mt-2">
+                <% errors.filter(error=>error.param==='fail').forEach(err=>{ %>
+                <div class="alert alert-danger alert-dismissible fade show" id="fail" role="alert">
+                    <%= err.msg %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <% }) %>
+            </div>
+            <div class="mt-2">
+                    <% errors.filter(error=>error.param==='update-fail').forEach(err=>{ %>
+                    <div class="alert alert-danger alert-dismissible fade show" id="update-fail" role="alert">
+                        <%= err.msg %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <% }) %>
+                </div>
+            <form action="/user/profile/update" style="display: none" id="updateform" method="POST" >
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" value=<%= result.name %> class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" value=<%= result.email %> class="form-control">
+                    <div class="mt-2">
+                        <% errors.filter(error=>error.param==='invalid').forEach(err=>{ %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= err.msg %>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control">
+                </div>
+                <input type="hidden" name="token" id="hidden-auth" >
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
+            <hr>
+            <div id="login-button" class="mb-2">
+
+            </div>
+            <button onclick="signout()" id="signout" class="btn btn-primary">Signout</button>
+        </div>
+        <div class="col-sm-4 col-md-3"></div>
+    </div>
+</div>
+<script>
+    const token='<%= authToken %>';
+    console.log(token);
+    if(token){
+        localStorage.setItem('token',token);
+        document.querySelector('#auth-span').textContent=token;
+        document.querySelector('#hidden-auth').value=token;
+    }else{
+        document.querySelector('#hidden-auth').value='';
+    }
+    if(document.querySelector('#fail')){
+        document.querySelector('.card').style.display='none';
+        document.querySelector('#signout').style.display='none';
+        document.querySelector('#login-button').innerHTML=`<a href='/user/signin' class='btn btn-primary'>Login</a>`;
+    }
+    function displayForm(){
+        document.querySelector('#update-profile').style.display='none';
+        document.querySelector('#updateform').style.display='block';
+        //console.log(errors)
+    }
+    function signout(){
+        //document.querySelector('#token').value='';
+        localStorage.clear();
+        window.location='/user/signin';
+    }
+</script>
+<% include partials/footer %>
